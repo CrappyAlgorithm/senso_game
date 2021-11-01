@@ -1,3 +1,6 @@
+ #include "game_setup.h"
+ #include "util.h"
+ 
  #include <stdio.h>
  #include <stdbool.h>
 
@@ -14,7 +17,9 @@ extern "C" {
 
 bool check_next_input(button b);
 
-void switch_led_state(led l);
+void toggle_led(led l);
+
+void toggle_all_led(void);
 
 #ifdef __cplusplus
 }
