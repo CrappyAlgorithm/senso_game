@@ -16,6 +16,22 @@ void senso(event_t event) {
                 toggle_all_led();
                 ms_sleep(T_SHORT);
                 state = RGBY;
+            } else if (event == play_standby) {
+                toggle_led(RED);
+                ms_sleep(T_SHORT);
+                state = R;
+            } else if (event == play_standby_y) {
+                toggle_led(YELLOW);
+                ms_sleep(T_SHORT);
+                state = Y;
+            } else if (event == play_standby_b) {
+                toggle_led(BLUE);
+                ms_sleep(T_SHORT);
+                state = B;
+            } else if (event == play_standby_g) {
+                toggle_led(GREEN);
+                ms_sleep(T_SHORT);
+                state = G;
             } else if (event == demo) {
                 toggle_all_led();
                 ms_sleep(T_NDEF);
@@ -41,6 +57,14 @@ void senso(event_t event) {
                 toggle_led(RED);
                 ms_sleep(T_SHORT);
                 state = R;
+            } else if (event == play_end) {
+                toggle_all_led();
+                ms_sleep(T_SHORT);
+                state = RGBY;
+            } else if (event == play_end_long) {
+                toggle_all_led();
+                ms_sleep(T_LONG);
+                state = RGBY;
             }
             break;
         case RGBY:
@@ -54,6 +78,10 @@ void senso(event_t event) {
                 state = GBY;
             } else if (event == imitate) {
                 toggle_all_led();
+                state = OFF;
+            } else if (event == play_end) {
+                toggle_all_led();
+                ms_sleep(T_LONG);
                 state = OFF;
             }
             break;
@@ -89,7 +117,11 @@ void senso(event_t event) {
                 state = OFF;
             }
         case R:
-            if (event == create_target) {
+            if (event == play_standby) {
+                toggle_led(RED);
+                ms_sleep(T_SHORT);
+                state = OFF;
+            } else if (event == create_target) {
                 toggle_led(RED);
                 ms_sleep(T_SHORT);
                 state = OFF;
@@ -100,7 +132,11 @@ void senso(event_t event) {
             }
             break;
         case G:
-            if (event == demo) {
+            if (event == play_standby) {
+                toggle_led(GREEN);
+                ms_sleep(T_SHORT);
+                state = OFF;
+            } else if (event == demo) {
                 toggle_led(GREEN);
                 ms_sleep(T_NDEF);
                 state = OFF;
@@ -111,14 +147,22 @@ void senso(event_t event) {
             }
             break;
         case B:
-            if (event == create_target) {
+            if (event == play_standby) {
+                toggle_led(BLUE);
+                ms_sleep(T_SHORT);
+                state = OFF;
+            } else if (event == create_target) {
                 toggle_led(BLUE);
                 ms_sleep(T_SHORT);
                 state = OFF;
             }
             break;
         case Y:
-            if (event == create_target) {
+            if (event == play_standby) {
+                toggle_led(YELLOW);
+                ms_sleep(T_SHORT);
+                state = OFF;
+            } else if (event == create_target) {
                 toggle_led(YELLOW);
                 ms_sleep(T_SHORT);
                 state = OFF;
@@ -178,11 +222,38 @@ bool match_next_button(void) {
     return false;
 } 
 
+void raise_level(void) {
+    level++;
+    if (level <= 4 ||  (level >= 9 && level <= 12)) {
+        n++;
+    } else {
+        t = t - t / 10;
+    }
+}
+
+void reset_game(void) {
+    n = N;
+    t = T;
+    level = 1;
+}
+
 void play_init_sequence(void) {
     printf("%s\n", "start init");
     /* init phase */
     senso(init);    /* all on -> RGBY */
     senso(init);    /* all off -> OFF */
+}
+
+void play_standby_sequence(void) {
+    printf("%s\n", "start standby");
+    senso(play_standby);
+    senso(play_standby);
+    senso(play_standby_y);
+    senso(play_standby);
+    senso(play_standby_b);
+    senso(play_standby);
+    senso(play_standby_g);
+    senso(play_standby);
 }
 
 void play_demo_sequence(void) {
@@ -229,22 +300,24 @@ void play_lose_sequence(void) {
     }
 }
 
-int main() {
-    play_init_sequence();    
-
-    /* need to add standby mode */
-
-    play_demo_sequence();
-
-    play_imitation_sequence();
-    
-    if (failure) {
-        play_lose_sequence();
-        failure = false;
-        /* reset game */ 
-    } else {  
-        play_break_sequence();
-        senso(raise_level);
+void play_end_sequence(void) {
+    printf("%s\n", "start end");
+    for (int j = 0; j < END_SEQUENCE_ROUNDS; j++) {
+        if (j % 2 == 0) {
+            senso(play_end_long);
+        } else {
+            senso(play_end);
+        }
+        senso(play_end);
     }
+}
 
+int main() {
+    printf("level=%d, n=%d, t=%d\n", level, n, t);
+    for (int j = 1; j < MAX_LVL; j++) {
+        raise_level();
+        printf("level=%d, n=%d, t=%d\n", level, n, t);
+    }
+    reset_game();
+    printf("level=%d, n=%d, t=%d\n", level, n, t);
 }

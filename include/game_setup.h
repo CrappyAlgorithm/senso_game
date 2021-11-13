@@ -15,6 +15,8 @@
 
 #define SEQUENCE_ROUNDS 5
 
+#define END_SEQUENCE_ROUNDS 4
+
 #define COLOR_COUNT 4
 
 typedef enum {RED, GREEN, BLUE, YELLOW} color;
