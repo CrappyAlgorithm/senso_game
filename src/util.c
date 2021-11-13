@@ -10,3 +10,12 @@ bool ms_sleep(long msec) {
     nanosleep(&ts, NULL);
     return true;
 }
+
+clock_t duration_in_clocks(long msec) {
+    return (clock_t) msec / 1000 * CLOCKS_PER_SEC;
+}
+
+color get_random_led(void) {
+    int random = rand() % COLOR_COUNT;
+    return (color) random;
+}
