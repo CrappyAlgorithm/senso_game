@@ -198,7 +198,6 @@ bool match_next_button(void) {
     enable_input();
     while (clock() < end) {
         bool right_button = false;
-        bool wrong_button = false;
         bool pressed[COLOR_COUNT] = {'\0'};
         get_input(&pressed[0]);
         for (int j = 0; j < COLOR_COUNT; j++) {
@@ -206,14 +205,12 @@ bool match_next_button(void) {
                 if ((color) j == targets[i]) {
                     right_button = true;
                 } else {
-                    wrong_button = true;
+                    disable_input();
+                    return false;
                 }
             }
         }
-        if (wrong_button) {
-            disable_input();
-            return false;
-        } else if (right_button) {
+        if (right_button) {
             disable_input();
             return true;
         }
