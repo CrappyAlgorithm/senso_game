@@ -1,6 +1,6 @@
 #include "senso.h"
 
-state_t state = OFF;
+volatile state_t state = OFF;
 int n = N;
 int t = T_LONG;
 int level = 1;
@@ -173,7 +173,6 @@ void senso(event_t event) {
             break;
     
     }
-    printf("%s", "-------------------\n");
 }
 
 state_t add_target_led(void) {
@@ -195,7 +194,6 @@ state_t add_target_led(void) {
 
 bool match_next_button(void) {
     clock_t end = duration_in_clocks(t) + clock();
-    enable_input();
     while (clock() < end) {
         bool right_button = false;
         bool pressed[COLOR_COUNT] = {'\0'};
@@ -205,17 +203,14 @@ bool match_next_button(void) {
                 if ((color) j == targets[i]) {
                     right_button = true;
                 } else {
-                    disable_input();
                     return false;
                 }
             }
         }
         if (right_button) {
-            disable_input();
             return true;
         }
     }
-    disable_input();
     return false;
 } 
 
@@ -235,14 +230,11 @@ void reset_game(void) {
 }
 
 void play_init_sequence(void) {
-    printf("%s\n", "start init");
-    /* init phase */
     senso(init);    /* all on -> RGBY */
     senso(init);    /* all off -> OFF */
 }
 
 void play_standby_sequence(void) {
-    printf("%s\n", "start standby");
     senso(play_standby);
     senso(play_standby);
     senso(play_standby_y);
@@ -254,8 +246,6 @@ void play_standby_sequence(void) {
 }
 
 void play_demo_sequence(void) {
-    printf("\n%s\n", "start demo");
-    /* demo phase */
     senso(demo);    /* all on -> RGBY */
     senso(demo);    /* red off -> GBY */
     senso(demo);    /* yellow off -> GB */
@@ -270,19 +260,14 @@ void play_demo_sequence(void) {
 }
 
 void play_imitation_sequence(void) {
-    printf("%s\n", "start imitation");
-    /* imitation phase */
     i = 0;
     while (i < n && !failure) { /* check user input for all n leds */
-        printf("%s= ", "target");
         senso(imitate);
         i++;
     }
 }
 
 void play_break_sequence(void) {
-    printf("%s\n", "start break");
-    /* sequence phase for break */
     for (i = 0; i <= SEQUENCE_ROUNDS; i++) {
         senso(play_break);
     }
@@ -290,15 +275,12 @@ void play_break_sequence(void) {
 }
 
 void play_lose_sequence(void) {
-    printf("%s\n", "start lose");
-    /* sequence phase for lose */
     for (i = 0; i <= SEQUENCE_ROUNDS; i++) {
         senso(play_lose);
     }
 }
 
 void play_end_sequence(void) {
-    printf("%s\n", "start end");
     for (int j = 0; j < END_SEQUENCE_ROUNDS; j++) {
         if (j % 2 == 0) {
             senso(play_end_long);
@@ -309,12 +291,18 @@ void play_end_sequence(void) {
     }
 }
 
-int main() {
-    printf("level=%d, n=%d, t=%d\n", level, n, t);
-    for (int j = 1; j < MAX_LVL; j++) {
-        raise_level();
-        printf("level=%d, n=%d, t=%d\n", level, n, t);
+int main(void) {
+    init_gpio();
+    ms_sleep(T_LONG);
+    play_init_sequence();
+    ms_sleep(T_LONG);
+    while (1) {
+        play_standby_sequence();
+        ms_sleep(T_LONG);
     }
-    reset_game();
-    printf("level=%d, n=%d, t=%d\n", level, n, t);
+    
+    //toggle_all_led();
+    //ms_sleep(T_LONG);
+    //toggle_all_led();
+    return EXIT_SUCCESS;
 }

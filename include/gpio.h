@@ -11,14 +11,21 @@
 extern "C" {
 #endif
 
+#define REG(P) (*(volatile uint32_t *) (P))
+
+#define GPIO_BASE 0x10012000
+#define GPIO_INPUT_EN 0x4
+#define GPIO_OUTPUT_EN 0x8
+#define GPIO_OUTPUT_VAL 0xc
+#define GPIO_IOF_EN 0x38
+
 typedef struct {
     color c;
     int pin;
+    bool active;
 } pin_mapping;
 
-void enable_input(void);
-
-void disable_input(void);
+void init_gpio(void);
 
 void get_input(bool *pressed);
 
