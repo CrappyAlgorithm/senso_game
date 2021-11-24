@@ -20,20 +20,52 @@ pin_mapping BUTTON[4] = {{RED, 2}, {GREEN, 19}, {BLUE, 20}, {YELLOW, 1}};
 
 void init_gpio(void) {
     for (int i = 0; i < COLOR_COUNT; i++) {
+        // init leds
 	    REG(GPIO_BASE + GPIO_IOF_EN) &= ~(1 << LEDS[i].pin);
 	    REG(GPIO_BASE + GPIO_INPUT_EN) &= ~(1 << LEDS[i].pin);
 	    REG(GPIO_BASE + GPIO_OUTPUT_EN) |= 1 << LEDS[i].pin;
 	    REG(GPIO_BASE + GPIO_OUTPUT_VAL) &= ~(1 << LEDS[i].pin);
         LEDS[i].active = false;
+
+        // init button
+        REG(GPIO_BASE + GPIO_IOF_EN) &= ~(1 << BUTTON[i].pin);
+        REG(GPIO_BASE + GPIO_PUE) |= 1 << BUTTON[i].pin;
+	    REG(GPIO_BASE + GPIO_INPUT_EN) |= 1 << BUTTON[i].pin;
+	    REG(GPIO_BASE + GPIO_OUTPUT_EN) &= ~(1 << BUTTON[i].pin);
+	    REG(GPIO_BASE + GPIO_OUTPUT_VAL) &= ~(1 << BUTTON[i].pin);
     }
 }
 
-void get_input(bool *pressed) {
-    int input;
-    scanf("%d", &input);
-    if (input >= 0 && input < COLOR_COUNT) {
-        pressed[input] = true;
+bool check_button(color c, u_int32_t msec, bool ignore_wrong) {
+    while(msec > 0) {
+        for (int i = 0; i < COLOR_COUNT; i++) {
+            if (REG(GPIO_BASE + GPIO_INPUT_VAL) & (1 << BUTTON[i].pin)) {
+                BUTTON[i].active = false;
+            } else {
+                BUTTON[i].active = true;
+            }
+        }
+        bool right_button = false;
+        bool wrong_button = false;
+        for (int i = 0; i < COLOR_COUNT; i++) {
+            if (BUTTON[i].active) {
+                if (BUTTON[i].c == c) {
+                    right_button = true;
+                } else {
+                    wrong_button = true;
+                }
+            }
+        }
+        if (wrong_button && !ignore_wrong) {
+            return false;
+        }
+        if (right_button) {
+            return true;
+        }
+        msec -= 100;
+        ms_delay(100);
     }
+    return false;
 }
 
 void toggle_led(color c) {

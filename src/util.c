@@ -1,19 +1,11 @@
 #include "util.h"
 
-bool ms_sleep(long msec) {
+void ms_delay(u_int32_t msec) {
     if (msec < 0) {
-        return false;
+        return;
     }
-    delay(msec);
-    /*
-    struct timespec ts;
-    ts.tv_sec = msec / 1000;
-    ts.tv_nsec = (msec % 1000) * 1000000;
-    nanosleep(&ts, NULL);
-    */
-    //volatile uint32_t i = 0;
-    //for (i = 0; i < 184210; i++){}
-    return true;
+    volatile uint64_t i = 0;
+    for (i = 0; i < MS_SECONDS_AQUIVALENT * msec; i++){}
 }
 
 clock_t duration_in_clocks(long msec) {
