@@ -263,6 +263,12 @@ void play_end_sequence(void) {
 int main(void) {
     init_gpio();
     play_init_sequence();
+    play_standby_sequence();
+    play_demo_sequence();
+
+    /*
+    init_gpio();
+    play_init_sequence();
     play_demo_sequence();
     while (1) {
         play_standby_sequence();
@@ -287,5 +293,6 @@ int main(void) {
             }
         }
     }
+    */
     return EXIT_SUCCESS;
 }

@@ -8,14 +8,10 @@
 #include <time.h>
 #include <stdlib.h>
 
-#define CLINT_BASE_ADDR 0x0200000
-#define CLINT_MTIME 0xBFF7
+#define CLINT_BASE_ADDR 0x2000000
+#define CLINT_MTIME 0xBFF8
 
-/**
- * @brief Defines a millisecond loop aquivalent to simulate time.
- * 
- */
-#define MS_SECONDS_AQUIVALENT 400
+#define CLOCK_FREQUENCY 32.768
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +22,7 @@ extern "C" {
  * 
  * @param msec delay value in milliseconds
  */
-void ms_delay(u_int32_t msec);
+void ms_delay(u_int64_t msec);
 
 /**
  * @brief Get a random led.
