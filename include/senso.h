@@ -6,21 +6,34 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 /**
  * @brief Defines the possible states of the state machine.
  * 
  */
-typedef enum {OFF, RGBY, GBY, GB, GY, RB, G, R, B, Y} state_t;
+typedef enum {
+    INITIAL_OFF, INITIAL_ON,   // init states
+    STANDBY_OFF, STANDBY_G, STANDBY_B, STANDBY_Y, STANDBY_R,  // standby states
+    DEMO_OFF, DEMO_ON, DEMO_BYR, DEMO_YR, DEMO_R, DEMO_RAND_ON,   // demo states
+    IMITATE_OFF, IMITATE_RAND_ON,    // imitate states
+    LOSE_OFF, LOSE_R, LOSE_BINARY,   // lose states
+    BREAK_OFF, BREAK_GY, BREAK_BR, BREAK_CONTINUE,   // break states
+    END_OFF, END_ON
+} state_t;
 
 /**
  * @brief Defines the possible events of the state machine.
  * 
  */
 typedef enum {
-    init, play_standby, play_standby_y, play_standby_b, 
-    play_standby_g, demo, create_target, imitate, 
-    play_break, end_break, play_lose, play_end, play_end_long
+    all_on, all_off, 
+    g_on, b_on, y_on, r_on,
+    g_off, b_off, y_off, r_off,
+    random_led, end_demo, check_input, 
+    disable_random_led, binary, start_break,
+    break_switch, end_break, short_end, 
+    long_end, go_standby
 } event_t;
 
 #ifdef __cplusplus
@@ -32,12 +45,6 @@ extern "C" {
  * 
  */
 void senso(event_t event);
-
-/**
- * @brief Add a random led to led targets.
- * 
- */
-void add_target_led(void);
 
 /**
  * @brief Raise the game level.
@@ -76,16 +83,16 @@ void play_demo_sequence(void);
 void play_imitation_sequence(void);
 
 /**
- * @brief Play the break sequence.
- * 
- */
-void play_break_sequence(void);
-
-/**
  * @brief Play the lose sequence.
  * 
  */
 void play_lose_sequence(void);
+
+/**
+ * @brief Play the break sequence.
+ * 
+ */
+void play_break_sequence(void);
 
 /**
  * @brief Play the end sequence.

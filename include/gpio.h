@@ -21,9 +21,11 @@ extern "C" {
 #define GPIO_OUTPUT_VAL 0xc
 #define GPIO_IOF_EN 0x38
 
+#define DEBOUNCE_DELAY 50
+
 typedef struct {
-    color c;
-    int pin;
+    color_t color;
+    u_int32_t pin;
     bool active;
 } pin_mapping;
 
@@ -33,11 +35,22 @@ typedef struct {
  */
 void init_gpio(void);
 
-bool check_button(color c, u_int32_t msec, bool ignore_wrong);
+/**
+ * @brief Check if given Buttons are pressed.
+ * 
+ */
+bool check_button(color_t color);
 
-void toggle_led(color c);
+/**
+ * @brief Checks if one of the given button is pressed.
+ * 
+ * @return returns the color of the pressed button. If multiple or no button is pressed it will return -1 as invalid color_t.
+ */
+color_t button_pressed(color_t colors[], size_t color_count);
 
-void toggle_all_led(void);
+void print_level_binary(int level);
+
+void set_led(color_t color, bool active);
 
 #ifdef __cplusplus
 }

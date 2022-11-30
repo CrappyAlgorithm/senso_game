@@ -21,14 +21,17 @@ extern "C" {
  * @brief Run a delay with given milliseconds. It is actually only simulated on not the correct time value.
  * 
  * @param msec delay value in milliseconds
+ * @return Returns true if only wanted button is pressed or false if false or multiple where pressed.
  */
+bool ms_delay_with_button_callback(u_int64_t msec, color_t (*callback)(void), color_t wanted);
+
 void ms_delay(u_int64_t msec);
 
 /**
  * @brief Get a random led.
  * 
  */
-color get_random_led(void);
+color_t get_random_led(void);
 
 #ifdef __cplusplus
 }

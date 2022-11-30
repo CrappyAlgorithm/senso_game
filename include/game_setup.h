@@ -20,12 +20,6 @@
 #define T_VERY_LONG 2*T_LONG
 
 /**
- * @brief Defines a time value for missing time delays.
- * 
- */
-#define T_NDEF T_SHORT
-
-/**
  * @brief Defines the start value for N.
  * 
  */
@@ -50,16 +44,16 @@
 #define MAX_LVL 16
 
 /**
- * @brief Defines the count of rounds used for sequences.
+ * @brief Defines the count of rounds used for lose and break sequences.
  * 
  */
-#define SEQUENCE_ROUNDS 5
+#define LOSE_BREAK_SEQUENCE_ROUNDS 5
 
 /**
  * @brief Defines the rounds of the end sequence.
  * 
  */
-#define END_SEQUENCE_ROUNDS 4
+#define END_SEQUENCE_ROUNDS 2
 
 /**
  * @brief Defines the count of colors.
@@ -71,6 +65,6 @@
  * @brief Defines the avaible colors.
  * 
  */
-typedef enum {RED, GREEN, BLUE, YELLOW} color;
+typedef enum {RED, YELLOW, BLUE, GREEN} color_t;
 
 #endif

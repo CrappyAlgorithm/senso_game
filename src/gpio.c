@@ -7,7 +7,7 @@
  * Red-V-Pins: RED = 11, GREEN = 2, BLUE = 5, YELLOW = 8
  * 
  */
-pin_mapping LEDS[4] = {{RED, 3}, {GREEN, 18}, {BLUE, 21}, {YELLOW, 0}};
+pin_mapping LEDS[4] = {{RED, 3}, {YELLOW, 0}, {BLUE, 21}, {GREEN, 18}};
 
 /**
  * Defines the pin mapping for button usage.
@@ -15,7 +15,7 @@ pin_mapping LEDS[4] = {{RED, 3}, {GREEN, 18}, {BLUE, 21}, {YELLOW, 0}};
  * Red-V-Pins: RED = 10, GREEN = 3, BLUE = 4, YELLOW = 9
  * 
  */
-pin_mapping BUTTON[4] = {{RED, 2}, {GREEN, 19}, {BLUE, 20}, {YELLOW, 1}};
+pin_mapping BUTTON[4] = {{RED, 2}, {YELLOW, 1}, {BLUE, 20}, {GREEN, 19}};
 
 
 void init_gpio(void) {
@@ -36,53 +36,51 @@ void init_gpio(void) {
     }
 }
 
-bool check_button(color c, u_int32_t msec, bool ignore_wrong) {
-    while(msec > 0) {
-        for (int i = 0; i < COLOR_COUNT; i++) {
-            if (REG(GPIO_BASE + GPIO_INPUT_VAL) & (1 << BUTTON[i].pin)) {
-                BUTTON[i].active = false;
-            } else {
-                BUTTON[i].active = true;
-            }
-        }
-        bool right_button = false;
-        bool wrong_button = false;
-        for (int i = 0; i < COLOR_COUNT; i++) {
-            if (BUTTON[i].active) {
-                if (BUTTON[i].c == c) {
-                    right_button = true;
-                } else {
-                    wrong_button = true;
-                }
-            }
-        }
-        if (wrong_button && !ignore_wrong) {
-            return false;
-        }
-        if (right_button) {
-            return true;
-        }
-        msec -= 100;
-        ms_delay(100);
+bool check_button(color_t color) {
+    bool active;
+    if (REG(GPIO_BASE + GPIO_INPUT_VAL) & (1 << BUTTON[color].pin)) {
+        active = false;
+    } else {
+        active = true;
     }
-    return false;
+    return active;
 }
 
-void toggle_led(color c) {
-    if (c < 0 || c >= COLOR_COUNT) {
+color_t button_pressed(color_t colors[], size_t color_count) {
+    bool pressed[color_count];
+    for (int i = 0; i < color_count; i++) {
+        pressed[i] = check_button(colors[i]);
+    }
+    ms_delay(DEBOUNCE_DELAY);
+    uint32_t pressed_count = 0;
+    color_t pressed_button = -1;
+    for (int i = 0; i < color_count; i++) {
+        if (pressed[i] && check_button(colors[i])) {
+            pressed_button = colors[i];
+            pressed_count++;
+        } 
+    }
+    if (pressed_count != 1) {
+        pressed_button = -1;
+    }
+    return pressed_button;
+}
+
+void print_level_binary(int level) {
+    for (int i = 0; i < COLOR_COUNT; i++) {
+        if (level & 1 << LEDS[i].color) {
+            set_led(LEDS[i].color, true);
+        }
+    }
+}
+
+void set_led(color_t color, bool active) {
+    if (color < 0 || color >= COLOR_COUNT) {
         return;
     }
-    if (LEDS[c].active) {
-        REG(GPIO_BASE + GPIO_OUTPUT_VAL) &= ~(1 << LEDS[c].pin);
-        LEDS[c].active = false;
-    } else {
-        REG(GPIO_BASE + GPIO_OUTPUT_VAL) |= (1 << LEDS[c].pin);
-        LEDS[c].active = true;
-    }
-}
-
-void toggle_all_led(void) {
-    for (int i = 0; i < COLOR_COUNT; i++) {
-        toggle_led((color) i);
+    if (active) {
+        REG(GPIO_BASE + GPIO_OUTPUT_VAL) |= (1 << LEDS[color].pin);
+    } else { 
+        REG(GPIO_BASE + GPIO_OUTPUT_VAL) &= ~(1 << LEDS[color].pin);
     }
 }
