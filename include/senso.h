@@ -3,6 +3,7 @@
 
 #include "gpio.h"
 #include "game_setup.h"
+#include "util.h"
 
 #include <stdlib.h>
 #include <time.h>

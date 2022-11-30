@@ -25,7 +25,6 @@ void init_gpio(void) {
 	    REG(GPIO_BASE + GPIO_INPUT_EN) &= ~(1 << LEDS[i].pin);
 	    REG(GPIO_BASE + GPIO_OUTPUT_EN) |= 1 << LEDS[i].pin;
 	    REG(GPIO_BASE + GPIO_OUTPUT_VAL) &= ~(1 << LEDS[i].pin);
-        LEDS[i].active = false;
 
         // init button
         REG(GPIO_BASE + GPIO_IOF_EN) &= ~(1 << BUTTON[i].pin);

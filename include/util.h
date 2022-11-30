@@ -4,7 +4,6 @@
 #include "game_setup.h"
 #include "gpio.h"
 
-#include <stdbool.h>
 #include <time.h>
 #include <stdlib.h>
 

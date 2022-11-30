@@ -2,10 +2,8 @@
 #define GPIO_H
 
 #include "game_setup.h"
-#include "util.h"
  
 #include <stdio.h>
-#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,10 +21,11 @@ extern "C" {
 
 #define DEBOUNCE_DELAY 50
 
+typedef enum { false, true } bool;
+
 typedef struct {
     color_t color;
     u_int32_t pin;
-    bool active;
 } pin_mapping;
 
 /**
