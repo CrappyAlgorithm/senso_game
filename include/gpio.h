@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#define REG(P) (*(volatile uint32_t *) (P))
+#define REG(P) (*(volatile u_int32_t *) (P))
 
 #define GPIO_BASE 0x10012000
 #define GPIO_INPUT_EN 0x4
@@ -47,7 +47,7 @@ bool check_button(color_t color);
  */
 color_t button_pressed(color_t colors[], size_t color_count);
 
-void print_level_binary(int level);
+void print_level_binary(u_int32_t level);
 
 void set_led(color_t color, bool active);
 
